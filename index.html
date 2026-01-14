@@ -30,6 +30,7 @@
       align-items: center;
       justify-content: center;
       padding: 2rem;
+      overflow: hidden;
     }
 
     @keyframes fadeInUp {
@@ -46,6 +47,8 @@
       padding: 3rem;
       backdrop-filter: blur(10px);
       animation: fadeInUp 1s ease forwards;
+      position: relative;
+      z-index: 2;
     }
 
     h1 {
@@ -131,7 +134,11 @@
       color: var(--muted);
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 600px), (orientation: portrait) {
+      .progress-labels {
+        display: none;
+      }
+
       .container {
         padding: 2rem;
       }
@@ -140,9 +147,34 @@
         font-size: 2rem;
       }
     }
+
+    .glow-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .glow {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(56,189,248,0.35),
+        transparent 70%
+      );
+      filter: blur(10px);
+      opacity: 0;
+      transform: scale(0.6);
+    }
   </style>
 </head>
+
 <body>
+
+  <div class="glow-layer"></div>
+
   <main class="container">
     <h1>Locus</h1>
 
@@ -183,5 +215,53 @@
       </span>
     </div>
   </main>
+
+  <script>
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const glowLayer = document.querySelector('.glow-layer');
+      const GLOW_COUNT = 5;
+
+      function random(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function animateGlow(glow) {
+        const size = random(80, 160);
+        const duration = random(3000, 6000);
+        const delay = random(500, 2500);
+
+        glow.style.width = `${size}px`;
+        glow.style.height = `${size}px`;
+        glow.style.left = `${random(5, 95)}vw`;
+        glow.style.top = `${random(5, 95)}vh`;
+        glow.style.transition = 'none';
+        glow.style.opacity = '0';
+        glow.style.transform = 'scale(0.6)';
+
+        setTimeout(() => {
+          glow.style.transition = `
+            opacity ${duration * 0.3}ms ease,
+            transform ${duration}ms ease
+          `;
+          glow.style.opacity = random(0.25, 0.6);
+          glow.style.transform = 'scale(1.2)';
+
+          setTimeout(() => {
+            glow.style.opacity = '0';
+          }, duration * 0.7);
+        }, delay);
+
+        setTimeout(() => animateGlow(glow), duration + delay + 500);
+      }
+
+      for (let i = 0; i < GLOW_COUNT; i++) {
+        const glow = document.createElement('div');
+        glow.className = 'glow';
+        glowLayer.appendChild(glow);
+        animateGlow(glow);
+      }
+    }
+  </script>
+
 </body>
 </html>
