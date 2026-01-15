@@ -168,6 +168,56 @@
       opacity: 0;
       transform: scale(0.6);
     }
+
+    .disclaimer {
+      margin-top: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+    
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    
+    .tool-card {
+      background: rgba(2, 6, 23, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+      color: var(--fg);
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+    
+    .tool-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+    
+    .tool-card img {
+      width: 32px;
+      height: 32px;
+      filter: brightness(0) invert(1);
+    }
+    
+    .tool-card span {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    
+    @media (max-width: 700px) {
+      .tools {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
   </style>
 </head>
 
@@ -186,6 +236,32 @@
       Locus is an early-stage project focused on improving how people discover and
       access relevant information across modern information environments.
     </p>
+
+    <p class="disclaimer">
+      Locus is not ready yet, in the meantime use these...
+    </p>
+    
+    <section class="tools">
+      <a class="tool-card" href="https://chat.openai.com" target="_blank" rel="noopener">
+        <img src="https://cdn.simpleicons.org/openai/white" alt="ChatGPT" />
+        <span>ChatGPT</span>
+      </a>
+    
+      <a class="tool-card" href="https://www.wikipedia.org" target="_blank" rel="noopener">
+        <img src="https://cdn.simpleicons.org/wikipedia/white" alt="Wikipedia" />
+        <span>Wikipedia</span>
+      </a>
+    
+      <a class="tool-card" href="https://stackexchange.com" target="_blank" rel="noopener">
+        <img src="https://cdn.simpleicons.org/stackexchange/white" alt="Stack Exchange" />
+        <span>Stack Exchange</span>
+      </a>
+    
+      <a class="tool-card" href="https://www.reddit.com" target="_blank" rel="noopener">
+        <img src="https://cdn.simpleicons.org/reddit/white" alt="Reddit" />
+        <span>Reddit</span>
+      </a>
+    </section>
 
     <section class="progress">
       <div class="progress-header">
