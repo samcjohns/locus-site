@@ -55,6 +55,42 @@
       font-size: 2.5rem;
       margin-bottom: 1rem;
       letter-spacing: -0.02em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .title-gradient {
+      background: linear-gradient(90deg, #7dd3fc 0%, #38bdf8 2.5rem, #8b5cf6 85%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 2px rgba(125, 211, 252, 0.25),
+        0 0 4px rgba(56, 189, 248, 0.2),
+        0 0 9px rgba(139, 92, 246, 0.5),
+        0 0 14px rgba(139, 92, 246, 0.35);
+    }
+
+    .title-white {
+      color: #ffffff;
+    }
+
+    .title-dot {
+      width: 0.8rem;
+      height: 0.8rem;
+      border-radius: 999px;
+      border: 2px solid rgba(156, 163, 175, 0.9);
+      background: transparent;
+      box-shadow: none;
+      transition: border-color 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
+      flex-shrink: 0;
+    }
+
+    .title-dot.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 6px rgba(56, 189, 248, 0.6), 0 0 16px rgba(56, 189, 248, 0.45);
     }
 
     p {
@@ -62,6 +98,26 @@
       line-height: 1.6;
       color: var(--muted);
       margin-bottom: 2rem;
+    }
+
+    .typewriter {
+      position: relative;
+    }
+
+    .typewriter::after {
+      content: "";
+      display: inline-block;
+      width: 0.08em;
+      height: 1em;
+      background: var(--accent);
+      margin-left: 0.12em;
+      transform: translateY(0.1em);
+      animation: blinkCaret 1s steps(2, end) infinite;
+    }
+
+    .typewriter.typing-complete::after {
+      opacity: 0;
+      animation: none;
     }
 
     .tagline {
@@ -117,13 +173,18 @@
       background: linear-gradient(90deg, var(--accent), #60a5fa);
       border-radius: 999px;
       width: 0%;
-      animation: fillProgress 2s ease forwards;
-      animation-delay: 0.5s;
+      animation: fillProgress 3s ease forwards;
+      animation-delay: 6s;
     }
 
     @keyframes fillProgress {
       from { width: 0%; }
       to { width: 25%; }
+    }
+
+    @keyframes blinkCaret {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
     }
 
     .progress-labels {
@@ -176,13 +237,16 @@
   <div class="glow-layer"></div>
 
   <main class="container">
-    <h1>Locus</h1>
+    <h1>
+      <span class="title-dot" aria-hidden="true"></span>
+      <span id="site-title" class="title-gradient" data-text="Locus">Locus</span>
+    </h1>
 
-    <p class="tagline">
+    <p class="tagline typewriter" data-typewriter data-typewriter-delay="500" data-typewriter-speed="15">
       A unified search and knowledge access platform.
     </p>
 
-    <p>
+    <p class="typewriter" data-typewriter data-typewriter-delay="2800">
       Locus is an early-stage project focused on improving how people discover and
       access relevant information across modern information environments.
     </p>
@@ -200,9 +264,9 @@
       <div class="progress-labels">
         <span>Concept</span>
         <span>Development</span>
-        <span>Testing</span>
-        <span>Limited Access</span>
-        <span>Availability</span>
+        <span>Alpha Testing</span>
+        <span>Beta Access</span>
+        <span>Full Availability</span>
       </div>
     </section>
 
@@ -217,6 +281,127 @@
   </main>
 
   <script>
+    function scrambleText(element, text, options = {}) {
+      if (!element) {
+        return;
+      }
+
+      const target = text ?? element.getAttribute("data-text") ?? element.textContent;
+      const chars = options.chars || "&%$#@!*+?=~";
+      const speed = options.speed || 60;
+      const cycles = options.cycles || 16;
+      const runningClass = options.runningClass;
+      const finishClass = options.finishClass;
+      const onComplete = options.onComplete;
+      const totalLength = target.length * 1.5;
+      let frame = 0;
+
+      if (runningClass) {
+        element.classList.add(runningClass);
+      }
+      if (finishClass) {
+        element.classList.remove(finishClass);
+      }
+
+      function randomChar() {
+        return chars[Math.floor(Math.random() * chars.length)];
+      }
+
+      const interval = setInterval(() => {
+        const progress = frame / cycles;
+        const revealCount = Math.min(target.length, Math.floor(target.length * progress));
+        const currentLength = Math.max(target.length, totalLength - revealCount);
+        let output = "";
+
+        for (let i = 0; i < revealCount; i += 1) {
+          output += target[i];
+        }
+
+        for (let i = revealCount; i < currentLength; i += 1) {
+          output += randomChar();
+        }
+
+        element.textContent = output;
+        frame += 1;
+
+        if (frame > cycles) {
+          clearInterval(interval);
+          element.textContent = target;
+          if (runningClass) {
+            element.classList.remove(runningClass);
+          }
+          if (finishClass) {
+            element.classList.add(finishClass);
+          }
+          if (typeof onComplete === "function") {
+            onComplete();
+          }
+        }
+      }, speed);
+    }
+
+    function typewriterText(element, options = {}) {
+      if (!element) {
+        return;
+      }
+
+      const target = element.getAttribute("data-text") ?? element.textContent.trim();
+      const speed = Number(options.speed ?? element.getAttribute("data-typewriter-speed")) || 26;
+      const delay = Number(options.delay ?? element.getAttribute("data-typewriter-delay")) || 0;
+      let index = 0;
+
+      element.setAttribute("data-text", target);
+      element.textContent = "";
+      element.classList.remove("typing-complete");
+
+      const start = () => {
+        const interval = setInterval(() => {
+          element.textContent = target.slice(0, index + 1);
+          index += 1;
+          if (index >= target.length) {
+            clearInterval(interval);
+            element.classList.add("typing-complete");
+          }
+        }, speed);
+      };
+
+      if (delay > 0) {
+        setTimeout(start, delay);
+      } else {
+        start();
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const title = document.getElementById("site-title");
+      const titleDot = document.querySelector(".title-dot");
+      if (title) {
+        scrambleText(title, "Locus Search", {
+          cycles: 32,
+          speed: 80,
+          runningClass: "title-white",
+          finishClass: "title-gradient",
+          onComplete: () => {
+            if (titleDot) {
+              titleDot.classList.add("active");
+            }
+          },
+        });
+      }
+
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const typewriterNodes = document.querySelectorAll("[data-typewriter]");
+        typewriterNodes.forEach((node) => typewriterText(node));
+      } else {
+        const typewriterNodes = document.querySelectorAll("[data-typewriter]");
+        typewriterNodes.forEach((node) => {
+          const target = node.getAttribute("data-text") ?? node.textContent.trim();
+          node.textContent = target;
+          node.classList.add("typing-complete");
+        });
+      }
+    });
+
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const glowLayer = document.querySelector('.glow-layer');
       const GLOW_COUNT = 5;
